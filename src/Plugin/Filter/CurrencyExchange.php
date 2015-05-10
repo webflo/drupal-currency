@@ -9,7 +9,7 @@ namespace Drupal\currency\Plugin\Filter;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\currency\ExchangeRateProviderInterface;
+use BartFeenstra\CurrencyExchange\ExchangeRateProviderInterface;
 use Drupal\currency\InputInterface;
 use Drupal\filter\Plugin\FilterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,7 +29,7 @@ class CurrencyExchange extends FilterBase implements ContainerFactoryPluginInter
   /**
    * The exchange rate provider.
    *
-   * @var \Drupal\currency\ExchangeRateProviderInterface
+   * @var \BartFeenstra\CurrencyExchange\ExchangeRateProviderInterface
    */
   protected $exchangeRateProvider;
 
@@ -51,7 +51,7 @@ class CurrencyExchange extends FilterBase implements ContainerFactoryPluginInter
    *   The plugin implementation definition.
    * @param \Drupal\Core\StringTranslation\TranslationInterface
    *   The string translator.
-   * @param \Drupal\currency\ExchangeRateProviderInterface $exchange_rate_provider
+   * @param \BartFeenstra\CurrencyExchange\ExchangeRateProviderInterface $exchange_rate_provider
    *   The exchange rate provider.
    * @param \Drupal\currency\InputInterface $input
    *   The input parser.
@@ -83,8 +83,8 @@ class CurrencyExchange extends FilterBase implements ContainerFactoryPluginInter
    * @see self::process()
    */
   function processCallback(array $matches) {
-    $currency_code_from = $matches[1];
-    $currency_code_to = $matches[2];
+    $source_currency_code = $matches[1];
+    $destination_currency_code = $matches[2];
     $amount = str_replace(':', '', $matches[3]);
     if (strlen($amount) !== 0) {
       $amount = $this->input->parseAmount($amount);
@@ -98,7 +98,7 @@ class CurrencyExchange extends FilterBase implements ContainerFactoryPluginInter
       $amount = 1;
     }
 
-    $exchange_rate = $this->exchangeRateProvider->load($currency_code_from, $currency_code_to);
+    $exchange_rate = $this->exchangeRateProvider->load($source_currency_code, $destination_currency_code);
     if ($exchange_rate) {
       return bcmul($amount, $exchange_rate->getRate(), 6);
     }

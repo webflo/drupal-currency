@@ -108,8 +108,8 @@ class FixedRatesOverviewUnitTest extends UnitTestCase {
    * @covers ::overview
    */
   public function testOverview() {
-    $currency_code_from = 'EUR';
-    $currency_code_to = 'NLG';
+    $source_currency_code = 'EUR';
+    $destination_currency_code = 'NLG';
     $rate = '2.20371';
 
     $currency_from = $this->getMock('\Drupal\currency\Entity\CurrencyInterface');
@@ -121,23 +121,23 @@ class FixedRatesOverviewUnitTest extends UnitTestCase {
       ->method('label');
 
     $map = array(
-      array($currency_code_from, $currency_from),
-      array($currency_code_to, $currency_to),
+      array($source_currency_code, $currency_from),
+      array($destination_currency_code, $currency_to),
     );
     $this->currencyStorage->expects($this->any())
       ->method('load')
       ->will($this->returnValueMap($map));
 
     $rates_configuration = array(
-      $currency_code_from => array(
-        $currency_code_to => $rate,
+      $source_currency_code => array(
+        $destination_currency_code => $rate,
       ),
     );
     $fixed_rates = $this->getMockBuilder('\Drupal\currency\Plugin\Currency\ExchangeRateProvider\FixedRates')
       ->disableOriginalConstructor()
       ->getMock();
     $fixed_rates->expects($this->once())
-      ->method('loadConfiguration')
+      ->method('loadAll')
       ->will($this->returnValue($rates_configuration));
 
     $this->currencyExchangeRateProviderManager->expects($this->once())

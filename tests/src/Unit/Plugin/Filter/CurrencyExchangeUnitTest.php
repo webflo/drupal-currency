@@ -7,7 +7,7 @@
 
 namespace Drupal\Tests\currency\Unit\Plugin\Filter;
 
-use Drupal\currency\ExchangeRate;
+use BartFeenstra\CurrencyExchange\ExchangeRate;
 use Drupal\currency\Plugin\Filter\CurrencyExchange;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,7 +22,7 @@ class CurrencyExchangeUnitTest extends UnitTestCase {
   /**
    * The exchange rate provider used for testing.
    *
-   * @var \Drupal\currency\ExchangeRateProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \BartFeenstra\CurrencyExchange\ExchangeRateProviderInterface|\PHPUnit_Framework_MockObject_MockObject
    */
   protected $exchangeRateProvider;
 
@@ -65,7 +65,7 @@ class CurrencyExchangeUnitTest extends UnitTestCase {
       'provider' => $this->randomMachineName(),
     ];
 
-    $this->exchangeRateProvider = $this->getMock('\Drupal\currency\ExchangeRateProviderInterface');
+    $this->exchangeRateProvider = $this->getMock('\BartFeenstra\CurrencyExchange\ExchangeRateProviderInterface');
 
     $this->input = $this->getMock('\Drupal\currency\InputInterface');
 
@@ -98,10 +98,10 @@ class CurrencyExchangeUnitTest extends UnitTestCase {
    * @covers ::processCallback
    */
   public function testProcess() {
-    $currency_code_from = 'EUR';
-    $currency_code_to = 'NLG';
+    $source_currency_code = 'EUR';
+    $destination_currency_code = 'NLG';
     $rate = '2.20371';
-    $exchange_rate = new ExchangeRate(NULL, NULL, $currency_code_from, $currency_code_to, $rate);
+    $exchange_rate = ExchangeRate::create($source_currency_code, $destination_currency_code, $rate);
 
     $this->input->expects($this->any())
       ->method('parseAmount')
@@ -109,7 +109,7 @@ class CurrencyExchangeUnitTest extends UnitTestCase {
 
     $this->exchangeRateProvider->expects($this->any())
       ->method('load')
-      ->with($currency_code_from, $currency_code_to)
+      ->with($source_currency_code, $destination_currency_code)
       ->will($this->returnValue($exchange_rate));
 
     $langcode = $this->randomMachineName(2);

@@ -2,7 +2,7 @@
 
 /**
  * @file Contains
- * \Drupal\Tests\currency\Unit\Plugin\Currency\ExchangeRateProvider\HistoricalRatesUnitTest.
+ * \Drupal\Tests\currency\Unit\Plugin\Currency\ExchangeRateProvider\ExchangeRateProviderDecoratorUnitTest.
  */
 
 namespace Drupal\Tests\currency\Unit\Plugin\Currency\ExchangeRateProvider;
@@ -11,11 +11,11 @@ use Drupal\currency\Plugin\Currency\ExchangeRateProvider\HistoricalRates;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\currency\Plugin\Currency\ExchangeRateProvider\HistoricalRates
+ * @coversDefaultClass \Drupal\currency\Plugin\Currency\ExchangeRateProvider\ExchangeRateProviderDecorator
  *
  * @group Currency
  */
-class HistoricalRatesUnitTest extends UnitTestCase {
+class ExchangeRateProviderDecoratorUnitTest extends UnitTestCase {
 
   /**
    * The decorated exchange rate provider

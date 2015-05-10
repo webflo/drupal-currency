@@ -72,11 +72,11 @@ class FixedRatesUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::loadConfiguration
+   * @covers ::loadAll
    */
-  public function testLoadConfiguration() {
+  public function testLoadAll() {
     list($rates) = $this->prepareExchangeRates();
-    $this->assertSame($rates, $this->plugin->loadConfiguration());
+    $this->assertSame($rates, $this->plugin->loadAll());
   }
 
   /**
@@ -134,14 +134,14 @@ class FixedRatesUnitTest extends UnitTestCase {
    * @covers ::save
    */
   public function testSave() {
-    $currency_code_from = $this->randomMachineName(3);
-    $currency_code_to = $this->randomMachineName(3);
+    $source_currency_code = $this->randomMachineName(3);
+    $destination_currency_code = $this->randomMachineName(3);
     $rate = mt_rand();
     list($rates, $rates_data) = $this->prepareExchangeRates();
-    $rates[$currency_code_from][$currency_code_to] = $rate;
+    $rates[$source_currency_code][$destination_currency_code] = $rate;
     $rates_data[] = array(
-      'currency_code_from' => $currency_code_from,
-      'currency_code_to' => $currency_code_to,
+      'currency_code_from' => $source_currency_code,
+      'currency_code_to' => $destination_currency_code,
       'rate' => $rate,
     );
 
@@ -151,7 +151,7 @@ class FixedRatesUnitTest extends UnitTestCase {
     $this->config->expects($this->once())
       ->method('save');
 
-    $this->plugin->save($currency_code_from, $currency_code_to, $rate);
+    $this->plugin->save($source_currency_code, $destination_currency_code, $rate);
   }
 
   /**
@@ -189,11 +189,11 @@ class FixedRatesUnitTest extends UnitTestCase {
       ),
     );
     $rates_data = array();
-    foreach ($rates as $currency_code_from => $currency_code_from_rates) {
-      foreach ($currency_code_from_rates as $currency_code_to => $rate) {
+    foreach ($rates as $source_currency_code => $source_currency_code_rates) {
+      foreach ($source_currency_code_rates as $destination_currency_code => $rate) {
         $rates_data[] = array(
-          'currency_code_from' => $currency_code_from,
-          'currency_code_to' => $currency_code_to,
+          'currency_code_from' => $source_currency_code,
+          'currency_code_to' => $destination_currency_code,
           'rate' => $rate,
         );
       }
@@ -209,11 +209,11 @@ class FixedRatesUnitTest extends UnitTestCase {
 
     $this->configFactory->expects($this->any())
       ->method('get')
-      ->with('currency.exchanger.fixed_rates')
+      ->with('currency.exchange_rate_provider.fixed_rates')
       ->will($this->returnValue($this->config));
     $this->configFactory->expects($this->any())
       ->method('getEditable')
-      ->with('currency.exchanger.fixed_rates')
+      ->with('currency.exchange_rate_provider.fixed_rates')
       ->will($this->returnValue($this->config));
 
     return array($rates, $rates_data);

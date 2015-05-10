@@ -7,7 +7,6 @@
 
 namespace Drupal\Tests\currency\Unit\Controller {
 
-use Drupal\Core\Form\FormState;
 use Drupal\currency\Controller\FixedRatesForm;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -118,12 +117,12 @@ class FixedRatesFormUnitTest extends UnitTestCase {
    * @dataProvider providerTestBuildForm
    */
   public function testBuildForm($rate_rate) {
-    $currency_code_from = $this->randomMachineName();
-    $currency_code_to = $this->randomMachineName();
+    $source_currency_code = $this->randomMachineName();
+    $destination_currency_code = $this->randomMachineName();
 
     $rate = NULL;
     if (!is_null($rate_rate)) {
-      $rate = $this->getMock('\Drupal\currency\ExchangeRateInterface');
+      $rate = $this->getMock('\BartFeenstra\CurrencyExchange\ExchangeRateInterface');
       $rate->expects($this->once())
         ->method('getRate')
         ->willReturn($rate_rate);
@@ -132,7 +131,7 @@ class FixedRatesFormUnitTest extends UnitTestCase {
     $plugin = $this->getMock('\Drupal\currency\Plugin\Currency\ExchangeRateProvider\ExchangeRateProviderInterface');
     $plugin->expects($this->once())
       ->method('load')
-      ->with($currency_code_from, $currency_code_to)
+      ->with($source_currency_code, $destination_currency_code)
       ->willReturn($rate);
 
     $this->currencyExchangeRateProviderManager->expects($this->once())
@@ -151,7 +150,7 @@ class FixedRatesFormUnitTest extends UnitTestCase {
 
     unset($currency_options['XXX']);
     $expected_build['currency_code_from'] = array(
-      '#default_value' => $currency_code_from,
+      '#default_value' => $source_currency_code,
       '#disabled' => !is_null($rate_rate),
       '#empty_value' => '',
       '#options' => $currency_options,
@@ -160,7 +159,7 @@ class FixedRatesFormUnitTest extends UnitTestCase {
       '#type' => 'select',
     );
     $expected_build['currency_code_to'] = array(
-      '#default_value' => $currency_code_to,
+      '#default_value' => $destination_currency_code,
       '#disabled' => !is_null($rate_rate),
       '#empty_value' => '',
       '#options' => $currency_options,
@@ -169,10 +168,10 @@ class FixedRatesFormUnitTest extends UnitTestCase {
       '#type' => 'select',
     );
     $expected_build['rate'] = array(
-      '#limit_currency_codes' => array($currency_code_to),
+      '#limit_currency_codes' => array($destination_currency_code),
       '#default_value' => array(
         'amount' => $rate_rate,
-        'currency_code' => $currency_code_to,
+        'currency_code' => $destination_currency_code,
       ),
       '#required' => TRUE,
       '#title' => 'Exchange rate',
@@ -199,7 +198,7 @@ class FixedRatesFormUnitTest extends UnitTestCase {
 
     $form = array();
     $form_state = $this->getMock('\Drupal\Core\Form\FormStateInterface');
-    $build = $this->controller->buildForm($form, $form_state, $currency_code_from, $currency_code_to);
+    $build = $this->controller->buildForm($form, $form_state, $source_currency_code, $destination_currency_code);
     $this->assertSame($expected_build, $build);
   }
 
@@ -226,13 +225,13 @@ class FixedRatesFormUnitTest extends UnitTestCase {
    * @covers ::submitForm
    */
   public function testSubmitFormWithSave() {
-    $currency_code_from = $this->randomMachineName();
-    $currency_code_to = $this->randomMachineName();
+    $source_currency_code = $this->randomMachineName();
+    $destination_currency_code = $this->randomMachineName();
     $rate = mt_rand();
 
     $values = [
-      'currency_code_from' => $currency_code_from,
-      'currency_code_to' => $currency_code_to,
+      'currency_code_from' => $source_currency_code,
+      'currency_code_to' => $destination_currency_code,
       'rate' => [
         'amount' => $rate,
       ],
@@ -267,7 +266,7 @@ class FixedRatesFormUnitTest extends UnitTestCase {
       ->getMock();
     $exchange_rate_provider->expects($this->once())
       ->method('save')
-      ->with($currency_code_from, $currency_code_to, $rate);
+      ->with($source_currency_code, $destination_currency_code, $rate);
 
     $this->currencyExchangeRateProviderManager->expects($this->once())
       ->method('createInstance')
@@ -278,8 +277,8 @@ class FixedRatesFormUnitTest extends UnitTestCase {
     $currency_to = $this->getMock('\Drupal\currency\Entity\CurrencyInterface');
 
     $map = [
-      [$currency_code_from, $currency_from],
-      [$currency_code_to, $currency_to],
+      [$source_currency_code, $currency_from],
+      [$destination_currency_code, $currency_to],
     ];
     $this->currencyStorage->expects($this->atLeastOnce())
       ->method('load')
@@ -292,12 +291,12 @@ class FixedRatesFormUnitTest extends UnitTestCase {
    * @covers ::submitForm
    */
   public function testSubmitFormWitDelete() {
-    $currency_code_from = $this->randomMachineName();
-    $currency_code_to = $this->randomMachineName();
+    $source_currency_code = $this->randomMachineName();
+    $destination_currency_code = $this->randomMachineName();
 
     $values = [
-      'currency_code_from' => $currency_code_from,
-      'currency_code_to' => $currency_code_to,
+      'currency_code_from' => $source_currency_code,
+      'currency_code_to' => $destination_currency_code,
     ];
 
     $form = [
@@ -329,7 +328,7 @@ class FixedRatesFormUnitTest extends UnitTestCase {
       ->getMock();
     $exchange_rate_provider->expects($this->once())
       ->method('delete')
-      ->with($currency_code_from, $currency_code_to);
+      ->with($source_currency_code, $destination_currency_code);
 
     $this->currencyExchangeRateProviderManager->expects($this->once())
       ->method('createInstance')
@@ -340,8 +339,8 @@ class FixedRatesFormUnitTest extends UnitTestCase {
     $currency_to = $this->getMock('\Drupal\currency\Entity\CurrencyInterface');
 
     $map = [
-      [$currency_code_from, $currency_from],
-      [$currency_code_to, $currency_to],
+      [$source_currency_code, $currency_from],
+      [$destination_currency_code, $currency_to],
     ];
     $this->currencyStorage->expects($this->atLeastOnce())
       ->method('load')

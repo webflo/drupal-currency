@@ -19,9 +19,9 @@ class PluginBasedExchangeRateProviderFormWebTest extends WebTestBase {
   public static $modules = array('currency');
 
   /**
-   * Test CurrencyExchanger's UI.
+   * Test the currency exchange rate provider UI.
    */
-  function testCurrencyExchangerUI() {
+  function testCurrencyExchangeRateProviderUi() {
     $exchange_delegator = \Drupal::service('currency.exchange_rate_provider');
 
     $user = $this->drupalCreateUser(array('currency.exchange_rate_provider.administer'));

@@ -62,7 +62,7 @@ class FixedRatesOverview extends ControllerBase implements ContainerInjectionInt
    * @param \Drupal\currency\Plugin\Currency\AmountFormatter\AmountFormatterManagerInterface $currency_amount_formatter_manager
    *   The currency locale delegator.
    * @param \Drupal\currency\Plugin\Currency\ExchangeRateProvider\ExchangeRateProviderManagerInterface $currency_exchange_rate_provider_manager
-   *   The currency exchanger plugin manager.
+   *   The currency exchange rate provider plugin manager.
    */
   public function __construct(TranslationInterface $translation_manager, UrlGeneratorInterface $url_generator, EntityStorageInterface $currency_storage, AmountFormatterManagerInterface $currency_amount_formatter_manager, ExchangeRateProviderManagerInterface $currency_exchange_rate_provider_manager) {
     $this->currencyStorage = $currency_storage;
@@ -90,7 +90,7 @@ class FixedRatesOverview extends ControllerBase implements ContainerInjectionInt
   public function overview() {
     /** @var \Drupal\currency\Plugin\Currency\ExchangeRateProvider\FixedRates $plugin */
     $plugin = $this->currencyExchangeRateProviderManager->createInstance('currency_fixed_rates');
-    $rates = $plugin->loadConfiguration();
+    $rates = $plugin->loadAll();
 
     $form['rates'] = array(
       '#empty' => $this->t('There are no exchange rates yet. <a href="@path">Add an exchange rate</a>.', array(
@@ -99,10 +99,10 @@ class FixedRatesOverview extends ControllerBase implements ContainerInjectionInt
       '#header' => array($this->t('From'), $this->t('To'), $this->t('Exchange rate'), $this->t('Operations')),
       '#type' => 'table',
     );
-    foreach ($rates as $currency_code_from => $currency_codes_to) {
-      foreach ($currency_codes_to as $currency_code_to => $rate) {
-        $currency_from = $this->currencyStorage->load($currency_code_from);
-        $currency_to = $this->currencyStorage->load($currency_code_to);
+    foreach ($rates as $source_currency_code => $currency_codes_to) {
+      foreach ($currency_codes_to as $destination_currency_code => $rate) {
+        $currency_from = $this->currencyStorage->load($source_currency_code);
+        $currency_to = $this->currencyStorage->load($destination_currency_code);
         if ($currency_from && $currency_to) {
           $row['currency_from'] = array(
             '#markup' => $currency_from->label(),
@@ -121,8 +121,8 @@ class FixedRatesOverview extends ControllerBase implements ContainerInjectionInt
               'title' => $this->t('edit'),
               'route_name' => 'currency.exchange_rate_provider.fixed_rates.edit',
               'route_parameters' => array(
-                'currency_code_from' => $currency_code_from,
-                'currency_code_to' => $currency_code_to,
+                'currency_code_from' => $source_currency_code,
+                'currency_code_to' => $destination_currency_code,
               ),
             )),
             '#type' => 'operations',

@@ -100,7 +100,7 @@ currency.exchange_rate_provider:
               label: Status
               type: boolean
 
-currency.exchanger.fixed_rates:
+currency.exchange_rate_provider.fixed_rates:
   label: Fixed currency exchange rates
   type: mapping
   mapping:

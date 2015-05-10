@@ -136,8 +136,8 @@ class PluginBasedExchangeRateProviderForm extends FormBase implements ContainerI
     $values = $form_state->getValues();
     uasort($values['exchange_rate_providers'], '\Drupal\Component\Utility\SortArray::sortByWeightElement');
     $configuration = array();
-    foreach ($values['exchange_rate_providers'] as $plugin_id => $exchanger_configuration) {
-      $configuration[$plugin_id] = (bool) $exchanger_configuration['enabled'];
+    foreach ($values['exchange_rate_providers'] as $plugin_id => $exchange_rate_provider_configuration) {
+      $configuration[$plugin_id] = (bool) $exchange_rate_provider_configuration['enabled'];
     }
     $this->exchangeRateProvider->saveConfiguration($configuration);
     drupal_set_message($this->t('The configuration options have been saved.'));

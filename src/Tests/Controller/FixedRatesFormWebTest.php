@@ -38,33 +38,33 @@ class FixedRatesFormWebTest extends WebTestBase {
     $config_importer = \Drupal::service('currency.config_importer');
     $config_importer->importCurrency('EUR');
     $config_importer->importCurrency('UAH');
-    $currency_code_from = 'EUR';
-    $currency_code_to = 'UAH';
+    $source_currency_code = 'EUR';
+    $destination_currency_code = 'UAH';
 
     // Test adding a exchange rate.
     $rate = '3';
     $values = array(
-      'currency_code_from' => $currency_code_from,
-      'currency_code_to' => $currency_code_to,
+      'currency_code_from' => $source_currency_code,
+      'currency_code_to' => $destination_currency_code,
       'rate[amount]' => $rate,
     );
     $this->drupalPostForm($path . '/add', $values, t('Save'));
-    $exchange_rate = $plugin->load($currency_code_from, $currency_code_to);
+    $exchange_rate = $plugin->load($source_currency_code, $destination_currency_code);
     $this->assertIdentical($exchange_rate->getRate(), $rate);
-    $this->assertIdentical($exchange_rate->getSourceCurrencyCode(), $currency_code_from);
-    $this->assertIdentical($exchange_rate->getDestinationCurrencyCode(), $currency_code_to);
+    $this->assertIdentical($exchange_rate->getSourceCurrencyCode(), $source_currency_code);
+    $this->assertIdentical($exchange_rate->getDestinationCurrencyCode(), $destination_currency_code);
 
     // Test editing a exchange rate.
     $rate = '6';
     $values = array(
       'rate[amount]' => $rate,
     );
-    $this->drupalPostForm($path . '/' . $currency_code_from . '/' . $currency_code_to, $values, t('Save'));
-    $exchange_rate = $plugin->load($currency_code_from, $currency_code_to);
+    $this->drupalPostForm($path . '/' . $source_currency_code . '/' . $destination_currency_code, $values, t('Save'));
+    $exchange_rate = $plugin->load($source_currency_code, $destination_currency_code);
     $this->assertIdentical($exchange_rate->getRate(), $rate);
 
     // Test deleting a exchange rate.
-    $this->drupalPostForm($path . '/' . $currency_code_from . '/' . $currency_code_to, $values, t('Delete'));
-    $this->assertFalse($plugin->load($currency_code_from, $currency_code_to));
+    $this->drupalPostForm($path . '/' . $source_currency_code . '/' . $destination_currency_code, $values, t('Delete'));
+    $this->assertFalse($plugin->load($source_currency_code, $destination_currency_code));
   }
 }

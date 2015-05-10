@@ -8,10 +8,10 @@
 namespace Drupal\currency\Plugin\Currency\ExchangeRateProvider;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\currency\ExchangeRateProviderInterface as GenericExchangeRateProviderInterface;
+use BartFeenstra\CurrencyExchange\ExchangeRateProviderInterface as GenericExchangeRateProviderInterface;
 
 /**
- * Describes a currency exchange rate provider plugin
+ * Defines a currency exchange rate provider plugin.
  */
 interface ExchangeRateProviderInterface extends GenericExchangeRateProviderInterface, PluginInspectionInterface {
 }

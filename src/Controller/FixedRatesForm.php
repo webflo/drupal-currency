@@ -86,14 +86,14 @@ class FixedRatesForm extends FormBase implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $currency_code_from = 'XXX', $currency_code_to = 'XXX') {
+  public function buildForm(array $form, FormStateInterface $form_state, $source_currency_code = 'XXX', $destination_currency_code = 'XXX') {
     $plugin = $this->currencyExchangeRateProviderManager->createInstance('currency_fixed_rates');
-    $rate = $plugin->load($currency_code_from, $currency_code_to);
+    $rate = $plugin->load($source_currency_code, $destination_currency_code);
 
     $options = $this->formHelper->getCurrencyOptions();
     unset($options['XXX']);
     $form['currency_code_from'] = array(
-      '#default_value' => $currency_code_from,
+      '#default_value' => $source_currency_code,
       '#disabled' => !is_null($rate),
       '#empty_value' => '',
       '#options' => $options,
@@ -102,7 +102,7 @@ class FixedRatesForm extends FormBase implements ContainerInjectionInterface {
       '#type' => 'select',
     );
     $form['currency_code_to'] = array(
-      '#default_value' => $currency_code_to,
+      '#default_value' => $destination_currency_code,
       '#disabled' => !is_null($rate),
       '#empty_value' => '',
       '#options' => $options,
@@ -111,10 +111,10 @@ class FixedRatesForm extends FormBase implements ContainerInjectionInterface {
       '#type' => 'select',
     );
     $form['rate'] = array(
-      '#limit_currency_codes' => array($currency_code_to),
+      '#limit_currency_codes' => array($destination_currency_code),
       '#default_value' => array(
         'amount' => !is_null($rate) ? $rate->getRate() : NULL,
-        'currency_code' => $currency_code_to,
+        'currency_code' => $destination_currency_code,
       ),
       '#required' => TRUE,
       '#title' => $this->t('Exchange rate'),
@@ -155,22 +155,22 @@ class FixedRatesForm extends FormBase implements ContainerInjectionInterface {
     /** @var \Drupal\currency\Plugin\Currency\ExchangeRateProvider\FixedRates $plugin */
     $plugin = $this->currencyExchangeRateProviderManager->createInstance('currency_fixed_rates');
     $values = $form_state->getValues();
-    $currency_code_from = $values['currency_code_from'];
-    $currency_code_to = $values['currency_code_to'];
-    $currency_from = $this->currencyStorage->load($currency_code_from);
-    $currency_to = $this->currencyStorage->load($currency_code_to);
+    $source_currency_code = $values['currency_code_from'];
+    $destination_currency_code = $values['currency_code_to'];
+    $currency_from = $this->currencyStorage->load($source_currency_code);
+    $currency_to = $this->currencyStorage->load($destination_currency_code);
 
     $triggering_element = $form_state->getTriggeringElement();
     switch ($triggering_element['#name']) {
       case 'save':
-        $plugin->save($currency_code_from, $currency_code_to, $values['rate']['amount']);
+        $plugin->save($source_currency_code, $destination_currency_code, $values['rate']['amount']);
         drupal_set_message($this->t('The exchange rate for @currency_title_from to @currency_title_to has been saved.', array(
           '@currency_title_from' => $currency_from->label(),
           '@currency_title_to' => $currency_to->label(),
         )));
         break;
       case 'delete':
-        $plugin->delete($currency_code_from, $currency_code_to);
+        $plugin->delete($source_currency_code, $destination_currency_code);
         drupal_set_message($this->t('The exchange rate for @currency_title_from to @currency_title_to has been deleted.', array(
           '@currency_title_from' => $currency_from->label(),
           '@currency_title_to' => $currency_to->label(),

@@ -1,4 +1,4 @@
-# Currency exchangers.
+# Currency exchange rate providers.
 currency.exchange_rate_provider.config:
   path: '/admin/config/regional/currency-exchange'
   defaults:
