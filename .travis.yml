@@ -18,16 +18,28 @@ env:
   - PATH=$PATH:/home/travis/.composer/vendor/bin
 
 install:
+  # Install Drush.
+  - composer global require --no-interaction --prefer-dist drush/drush:dev-master
+
+  # Install Apache.
+  - sudo apt-get update
+  - sudo apt-get install apache2 libapache2-mod-fastcgi
+
+before_script:
   # Download Drupal core.
   - cd $TRAVIS_BUILD_DIR/..
   - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git
 
+  # Fix run-tests.sh's output. See https://www.drupal.org/node/2189345.
+  - cd drupal
+  - curl https://www.drupal.org/files/issues/2189345-61.patch | git apply
+
   # Copy Currency into Drupal core.
   - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/
 
-  # Install Composer dependencies.
-  - cd $TRAVIS_BUILD_DIR/../drupal/modules/currency
-  - composer install
+  # Enable Currency and let Composer Manager install Composer dependencies.
+  - cd $TRAVIS_BUILD_DIR/../drupal
+  - drush en currency -y
 
 script:
   # Run PHPUnit tests and submit code coverage statistics.
