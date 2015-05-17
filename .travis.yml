@@ -44,7 +44,7 @@ before_script:
   - drush en composer_manager -y
   - drush cc drush
   - cd core
-  - drush composer-manager init
+  - drush composer-manager-init
 
   # Copy Currency into Drupal core and enable it.
   - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/
