@@ -50,6 +50,9 @@ before_script:
   - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/currency
   - cd $TRAVIS_BUILD_DIR/../drupal
   - drush en currency -y
+  - cd core
+  - composer drupal-rebuild
+  - composer drupal-update
 
 script:
   # Run PHPUnit tests and submit code coverage statistics.
