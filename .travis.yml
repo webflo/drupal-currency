@@ -19,7 +19,7 @@ env:
 
 install:
   # Install Drush.
-  - composer global require --no-interaction --prefer-dist drush/drush:dev-master
+  - composer global require drush/drush:dev-master --prefer-source -n -V
 
   # Install Apache.
   - sudo apt-get update
@@ -54,7 +54,7 @@ before_script:
   - drush en currency -y
   - cd core
   - composer drupal-rebuild
-  - composer update --no-interaction --prefer-source
+  - composer update --prefer-source -n -V
 
 script:
   # Run PHPUnit tests and submit code coverage statistics.
