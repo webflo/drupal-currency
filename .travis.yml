@@ -54,7 +54,7 @@ before_script:
   - drush en currency -y
   - cd core
   - composer drupal-rebuild
-  - composer drupal-update
+  - composer update --prefer-dist
 
 script:
   # Run PHPUnit tests and submit code coverage statistics.
