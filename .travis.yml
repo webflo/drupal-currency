@@ -40,7 +40,7 @@ before_script:
 
   # Initiate Composer Manager.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - drush dl composer_manager
+  - drush dl composer_manager-8.x-1.x-dev
   - drush en composer_manager -y
   - drush cc drush
   - cd core
