@@ -38,19 +38,20 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/../drupal
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-pass=admin -y
 
-  # Initiate Composer Manager.
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - drush dl composer_manager-8.x-1.x-dev
-  - drush en composer_manager -y
-  - drush cc drush
-  - cd core
-  - drush composer-manager-init
-
   # Copy Currency into Drupal core and enable it.
   - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/currency
   - cd $TRAVIS_BUILD_DIR/../drupal
   - drush en currency -y
+
+  # Install and initiate Composer Manager.
+  - cd $TRAVIS_BUILD_DIR/../drupal/modules
+  - git clone --branch 8.x-1.x --depth 1 http://git.drupal.org/project/composer_manager.git
+  - cd composer_manager
+  # Make Composer Manager support require-dev. See https://www.drupal.org/node/2490480.
+  - curl https://www.drupal.org/files/issues/composer_manager_2490480_3.patch | git apply
+  - drush en composer_manager -y
   - cd core
+  - drush composer-manager-init
   - composer drupal-rebuild
   - composer drupal-update
 
@@ -59,4 +60,4 @@ script:
   - cd $TRAVIS_BUILD_DIR/../drupal/modules/currency
   - mkdir -p build/logs
   - ../../core/vendor/bin/phpunit -c ./phpunit.xml.dist --bootstrap ../../core/tests/bootstrap.php --verbose --debug --coverage-clover ./build/logs/clover.xml || exit 1
-  - php ./vendor/bin/coveralls -v -c ./.coveralls.yml
+  - php ../../core/vendor/bin/coveralls -v -c ./.coveralls.yml
