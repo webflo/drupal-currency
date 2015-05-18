@@ -45,7 +45,7 @@ before_script:
   # Make Composer Manager support require-dev. See https://www.drupal.org/node/2490480.
   - curl https://www.drupal.org/files/issues/composer_manager_2490480_3.patch | git apply
   - drush en composer_manager -y
-  - cd core
+  - cd $TRAVIS_BUILD_DIR/../drupal/core
   - drush composer-manager-init
 
   # Copy Currency into Drupal core and enable it.
