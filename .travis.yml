@@ -38,11 +38,6 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/../drupal
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-pass=admin -y
 
-  # Copy Currency into Drupal core and enable it.
-  - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/currency
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - drush en currency -y
-
   # Install and initiate Composer Manager.
   - cd $TRAVIS_BUILD_DIR/../drupal/modules
   - git clone --branch 8.x-1.x --depth 1 http://git.drupal.org/project/composer_manager.git
@@ -52,6 +47,12 @@ before_script:
   - drush en composer_manager -y
   - cd core
   - drush composer-manager-init
+
+  # Copy Currency into Drupal core and enable it.
+  - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/currency
+  - cd $TRAVIS_BUILD_DIR/../drupal
+  - drush en currency -y
+  - cd core
   - composer drupal-rebuild
   - composer drupal-update
 
