@@ -17,7 +17,26 @@ matrix:
 env:
   - PATH=$PATH:/home/travis/.composer/vendor/bin
 
-install:
+script:
+  # Download Drupal core.
+  - cd $TRAVIS_BUILD_DIR/..
+  - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git
+
+  # Add Currency to Drupal core.
+  - cd $TRAVIS_BUILD_DIR/../drupal/core
+  - ./modules/currency/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
+  - composer require drupal/currency:dev-master
+
+  # Run PHPUnit tests.
+  - cd $TRAVIS_BUILD_DIR/../drupal/core
+  - mkdir -p build/logs
+  - ./vendor/bin/phpunit -c ../modules/currency/phpunit.xml.dist --bootstrap ./tests/bootstrap.php --verbose --debug --coverage-clover ./build/logs/clover.xml || exit 1
+  - php ./vendor/bin/coveralls -vvv -c ../modules/currency/.coveralls.yml
+
+  # Fix run-tests.sh's output. See https://www.drupal.org/node/2189345.
+  - cd $TRAVIS_BUILD_DIR/../drupal
+  - curl https://www.drupal.org/files/issues/2189345-61.patch | git apply
+
   # Install Drush.
   - composer global require drush/drush:dev-master --prefer-source -n -vvv
 
@@ -25,40 +44,6 @@ install:
   - sudo apt-get update
   - sudo apt-get install apache2 libapache2-mod-fastcgi
 
-before_script:
-  # Download Drupal core.
-  - cd $TRAVIS_BUILD_DIR/..
-  - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git
-
-  # Fix run-tests.sh's output. See https://www.drupal.org/node/2189345.
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - curl https://www.drupal.org/files/issues/2189345-61.patch | git apply
-
   # Install Drupal
   - cd $TRAVIS_BUILD_DIR/../drupal
   - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-pass=admin -y
-
-  # Install and initiate Composer Manager.
-  - cd $TRAVIS_BUILD_DIR/../drupal/modules
-  - git clone --branch 8.x-1.x --depth 1 http://git.drupal.org/project/composer_manager.git
-  - cd composer_manager
-  # Make Composer Manager support require-dev. See https://www.drupal.org/node/2490480.
-  - curl https://www.drupal.org/files/issues/composer_manager_2490480_3.patch | git apply
-  - drush en composer_manager -y
-  - cd $TRAVIS_BUILD_DIR/../drupal/core
-  - drush composer-manager-init
-
-  # Copy Currency into Drupal core and enable it.
-  - cp -Rv $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/modules/currency
-  - cd $TRAVIS_BUILD_DIR/../drupal
-  - drush en currency -y
-  - cd core
-  - composer drupal-rebuild
-  - composer update --prefer-source -n -vvv
-
-script:
-  # Run PHPUnit tests and submit code coverage statistics.
-  - cd $TRAVIS_BUILD_DIR/../drupal/modules/currency
-  - mkdir -p build/logs
-  - ../../core/vendor/bin/phpunit -c ./phpunit.xml.dist --bootstrap ../../core/tests/bootstrap.php --verbose --debug --coverage-clover ./build/logs/clover.xml || exit 1
-  - php ../../core/vendor/bin/coveralls -v -c ./.coveralls.yml

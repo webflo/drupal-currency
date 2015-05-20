@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+
+// Without this directive no PHP CLI script can accept any arguments.
+if (ini_get('register_argc_argv') == FALSE) {
+  print "ERROR: The PHP ini directive 'register_argc_argv' must be enabled.\n";
+  exit;
+}
+
+// Create a help text.
+$command = $argv[0];
+$usage = <<<EOT
+
+Usage:
+  $command \$repository \$path_to_composer_json
+
+EOT;
+
+// Validate the input.
+if (count($argv) != 3) {
+  print "ERROR: incorrect number of arguments.\n";
+  print $usage;
+  exit;
+}
+list(, $repository_path, $composer_json_path) = $argv;
+if (!is_readable($composer_json_path) || !is_writable($composer_json_path)) {
+  print sprintf("ERROR: The file '%s' does not exist, or is not readable and writable.\n", $composer_json_path);
+  exit;
+}
+
+// Read the original composer.json file.
+$json = json_decode(file_get_contents($composer_json_path));
+
+// Make sure the repositories array exists.
+if (!isset($json->repositories)) {
+  $json->repositories = [];
+}
+
+// Add the repository.
+$repository = new \stdClass();
+$repository->type = 'vcs';
+$repository->url = $repository_path;
+$json->repositories[] = $repository;
+
+// Save the altered data to the original composer.json file.
+file_put_contents($composer_json_path, json_encode($json, JSON_PRETTY_PRINT));
+
