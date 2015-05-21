@@ -18,6 +18,9 @@ env:
   - PATH=$PATH:/home/travis/.composer/vendor/bin
 
 script:
+  # Update Composer.
+  - composer self-update
+
   # Download Drupal core.
   - cd $TRAVIS_BUILD_DIR/..
   - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git
