@@ -20,6 +20,8 @@ env:
 script:
   # Update Composer.
   - composer self-update
+  - cd $TRAVIS_BUILD_DIR
+  - git branch dev-$TRAVIS_COMMIT $TRAVIS_COMMIT
 
   # Download Drupal core.
   - cd $TRAVIS_BUILD_DIR/..
@@ -29,7 +31,8 @@ script:
   - cd $TRAVIS_BUILD_DIR/../drupal
   - $TRAVIS_BUILD_DIR/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
   - cd core
-  - composer require drupal/currency:dev-master#$TRAVIS_COMMIT --prefer-source -n
+  - cat composer.json
+  - composer require drupal/currency:dev-$TRAVIS_COMMIT#$TRAVIS_COMMIT --prefer-source -n
 
   # Run PHPUnit tests.
   - cd $TRAVIS_BUILD_DIR/../drupal/core
