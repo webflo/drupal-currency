@@ -24,7 +24,7 @@ script:
 
   # Add Currency to Drupal core.
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - .$TRAVIS_BUILD_DIR/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
+  - $TRAVIS_BUILD_DIR/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
   - cd core
   - composer require drupal/currency:dev-master --prefer-source -n -vvv
 
