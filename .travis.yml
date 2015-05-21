@@ -21,7 +21,7 @@ script:
   # Update Composer.
   - composer self-update
   - cd $TRAVIS_BUILD_DIR
-  - git branch dev-$TRAVIS_COMMIT $TRAVIS_COMMIT
+  - git branch build-$TRAVIS_COMMIT $TRAVIS_COMMIT
   - git branch -a
 
   # Download Drupal core.
@@ -33,7 +33,7 @@ script:
   - $TRAVIS_BUILD_DIR/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
   - cd core
   - cat composer.json
-  - composer require -vvv drupal/currency:dev-$TRAVIS_COMMIT#$TRAVIS_COMMIT@dev --prefer-source -n
+  - composer require -vvv drupal/currency:dev-build-$TRAVIS_COMMIT@dev --prefer-source -n
   - cat composer.json
 
   # Run PHPUnit tests.
