@@ -22,6 +22,7 @@ script:
   - composer self-update
   - cd $TRAVIS_BUILD_DIR
   - git branch dev-$TRAVIS_COMMIT $TRAVIS_COMMIT
+  - git branch -a
 
   # Download Drupal core.
   - cd $TRAVIS_BUILD_DIR/..
