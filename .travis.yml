@@ -21,33 +21,29 @@ script:
   # Update Composer.
   - composer self-update
   - cd $TRAVIS_BUILD_DIR
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - git branch build-$TRAVIS_COMMIT $TRAVIS_COMMIT
   - git branch -a
 
   # Download Drupal core.
   - cd $TRAVIS_BUILD_DIR/..
-  - git clone --branch 8.0.x --depth 1 http://git.drupal.org/project/drupal.git
+  - composer create-project drupal-composer/drupal-project:8.x-dev drupal --stability dev --no-interaction
 
   # Add Currency to Drupal core.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - $TRAVIS_BUILD_DIR/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
-  - cd core
-  - cat composer.json
   - composer require -vvv drupal/currency:dev-build-$TRAVIS_COMMIT@dev --prefer-source -n
   - cat composer.json
 
   # Run PHPUnit tests.
   - cd $TRAVIS_BUILD_DIR/../drupal/core
   - mkdir -p build/logs
-  - ./vendor/bin/phpunit -c ../modules/currency/phpunit.xml.dist --bootstrap ./tests/bootstrap.php --verbose --debug --coverage-clover ./build/logs/clover.xml || exit 1
-  - php ./vendor/bin/coveralls -vvv -c ../modules/currency/.coveralls.yml
+  - ./vendor/bin/phpunit -c ../modules/contrib/currency/phpunit.xml.dist --bootstrap ./tests/bootstrap.php --verbose --debug --coverage-clover ./build/logs/clover.xml || exit 1
+  - php ./vendor/bin/coveralls -vvv -c ../modules/contrib/currency/.coveralls.yml
 
   # Fix run-tests.sh's output. See https://www.drupal.org/node/2189345.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - curl https://www.drupal.org/files/issues/2189345-61.patch | git apply
-
-  # Install Drush.
-  - composer global require drush/drush:dev-master --prefer-source -n -vvv
 
   # Install Apache.
   - sudo apt-get update
@@ -55,4 +51,4 @@ script:
 
   # Install Drupal
   - cd $TRAVIS_BUILD_DIR/../drupal
-  - drush si --db-url=mysql://root:@127.0.0.1/drupal --account-pass=admin -y
+  - ../vendor/drush/drush/drush si --db-url=mysql://root:@127.0.0.1/drupal --account-pass=admin -y
