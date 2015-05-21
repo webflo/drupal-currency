@@ -42,8 +42,8 @@ $repository->type = 'vcs';
 $repository->url = $repository_path;
 $json->repositories[] = $repository;
 
-$json->'minimum-stability' = 'dev';
-$json->'prefer-stable' = 'true';
+$json->{'minimum-stability'} = 'dev';
+$json->{'prefer-stable'} = 'true';
 
 // Save the altered data to the original composer.json file.
 file_put_contents($composer_json_path, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
