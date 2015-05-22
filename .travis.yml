@@ -37,13 +37,13 @@ script:
   - cat composer.json
 
   # Run PHPUnit tests.
-  - cd $TRAVIS_BUILD_DIR/../drupal/core
+  - cd $TRAVIS_BUILD_DIR/../drupal/web/core
   - mkdir -p build/logs
   - ./vendor/bin/phpunit -c ../modules/contrib/currency/phpunit.xml.dist --bootstrap ./tests/bootstrap.php --verbose --debug --coverage-clover ./build/logs/clover.xml || exit 1
   - php ./vendor/bin/coveralls -vvv -c ../modules/contrib/currency/.coveralls.yml
 
   # Fix run-tests.sh's output. See https://www.drupal.org/node/2189345.
-  - cd $TRAVIS_BUILD_DIR/../drupal
+  - cd $TRAVIS_BUILD_DIR/../drupal/web
   - curl https://www.drupal.org/files/issues/2189345-61.patch | git apply
 
   # Install Apache.
@@ -51,5 +51,5 @@ script:
   - sudo apt-get install apache2 libapache2-mod-fastcgi
 
   # Install Drupal
-  - cd $TRAVIS_BUILD_DIR/../drupal
+  - cd $TRAVIS_BUILD_DIR/../drupal/web
   - ../vendor/drush/drush/drush si --db-url=mysql://root:@127.0.0.1/drupal --account-pass=admin -y
