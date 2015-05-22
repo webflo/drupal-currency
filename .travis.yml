@@ -27,12 +27,12 @@ script:
 
   # Download Drupal core.
   - cd $TRAVIS_BUILD_DIR/..
-  - composer create-project drupal-composer/drupal-project:8.x-dev drupal --stability dev --no-interaction
+  - composer create-project drupal-composer/drupal-project:8.x-dev drupal --stability dev --no-interaction --no-install
 
   # Add Currency to Drupal core.
   - cd $TRAVIS_BUILD_DIR/../drupal
   - $TRAVIS_BUILD_DIR/bin/add-vcs-repository-to-composer-json $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../drupal/core/composer.json
-  - composer require -vvv drupal/core:8.0.*@dev
+  - composer require -vvv drupal/core:8.0.x-dev
   - composer require -vvv drupal/currency:dev-build-$TRAVIS_COMMIT@dev --prefer-source -n
   - cat composer.json
 
